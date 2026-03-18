@@ -1,5 +1,4 @@
 import {Body, Controller, Post} from '@nestjs/common';
-import {User} from "@app/user/entities/user.entity";
 import {AuthService} from "@app/user/auth/auth.service";
 import {LoginDto} from "@app/user/auth/dto/login.dto";
 import {AccessToken} from "@app/user/auth/auth.types";

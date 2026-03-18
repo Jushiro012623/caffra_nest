@@ -4,7 +4,7 @@ import {ConfigModule} from "@nestjs/config";
 import {UserModule} from "@app/user/user.module";
 import {AuthModule} from "@app/user/auth/auth.module";
 import {appConfig, jwtConfig, typeormConfig} from "@app/config";
-import {IsUniqueConstraintValidator} from "@app/common";
+import {IsConfirmedValidator, IsUniqueConstraintValidator} from "@app/common";
 
 @Module({
     imports: [
@@ -16,7 +16,7 @@ import {IsUniqueConstraintValidator} from "@app/common";
         UserModule, AuthModule
     ],
     controllers: [],
-    providers: [IsUniqueConstraintValidator],
+    providers: [IsUniqueConstraintValidator, IsConfirmedValidator],
 })
 export class AppModule {
 }

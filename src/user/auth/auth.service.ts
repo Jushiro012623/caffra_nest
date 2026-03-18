@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, UnauthorizedException} from '@nestjs/common';
+import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {LoginDto} from "@app/user/auth/dto/login.dto";
 import {UserService} from "@app/user/user.service";
 import {JwtService} from "@nestjs/jwt";
@@ -35,11 +35,6 @@ export class AuthService {
 
     async register(registerDto: RegisterDto): Promise<any> {
         const {confirm_password, ...user} = registerDto
-
-        const password = new Password(user.password)
-        if (!password.confirm(confirm_password)) {
-            throw new BadRequestException('Password don\'t match')
-        }
 
         const {id} = await this.user.save(this.user.create(user))
 
