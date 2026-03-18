@@ -1,0 +1,1 @@
+export * from '@app/common/validators/is-unique-constraint.validator'

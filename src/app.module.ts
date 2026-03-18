@@ -1,15 +1,22 @@
 import {Module} from '@nestjs/common';
-import {TypeOrmModule} from './typeorm/typeorm.module';
+import {TypeOrmModule} from "@nestjs/typeorm";
 import {ConfigModule} from "@nestjs/config";
+import {UserModule} from "@app/user/user.module";
+import {AuthModule} from "@app/user/auth/auth.module";
+import {appConfig, jwtConfig, typeormConfig} from "@app/config";
+import {IsUniqueConstraintValidator} from "@app/common";
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
+            load: [appConfig, typeormConfig, jwtConfig],
         }),
-        TypeOrmModule,
+        TypeOrmModule.forRoot(typeormConfig()),
+        UserModule, AuthModule
     ],
     controllers: [],
-    providers: [],
+    providers: [IsUniqueConstraintValidator],
 })
-export class AppModule {}
+export class AppModule {
+}
