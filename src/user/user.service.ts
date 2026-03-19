@@ -33,7 +33,7 @@ export class UserService {
     async create(createUserDto: CreateUserDto): Promise<any> {
         const {confirm_password, ...dto} = createUserDto
 
-        Object.assign(dto, {roles: await this.roleService.findWhere({id: In(dto.roles)})})
+        Object.assign(dto, {roles: await this.roleService.resolveRoles(dto.roles)})
 
         const createUser = this.userRepository.create(dto)
 
@@ -45,7 +45,7 @@ export class UserService {
         if (!user) throw new NotFoundException('User not found')
 
         if (updateUserDto.roles) {
-            Object.assign(updateUserDto, {roles: await this.roleService.findWhere({id: In(updateUserDto.roles)})})
+            Object.assign(updateUserDto, {roles: await this.roleService.resolveRoles(updateUserDto.roles)})
         }
 
         if (updateUserDto.password) {
@@ -54,17 +54,19 @@ export class UserService {
 
         Object.assign(user, updateUserDto)
         const updatedUser = await this.save(user)
-        console.log(updateUserDto.password)
+
         return new UserResponseDto(updatedUser)
 
     }
 
     async remove(id: string): Promise<void> {
-        const user = await this.findOneBy({where: {id}})
+        const user = await this.userRepository.findOneBy({id})
+        if (!user) {
+            throw new NotFoundException('User not found')
+        }
 
-        if (!user) throw new NotFoundException('User not found')
-
-        await this.userRepository.softDelete(id)
+        user.deleted_at = new Date()
+        await this.userRepository.save(user)
 
     }
 

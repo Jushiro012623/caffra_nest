@@ -58,7 +58,7 @@ export class AuthService {
         });
 
         if (!user) {
-            throw new UnauthorizedException("Invalid credentials")
+            throw new UnauthorizedException()
         }
 
         return new UserResponseDto(user);
