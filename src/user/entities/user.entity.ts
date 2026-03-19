@@ -42,11 +42,6 @@ export class User {
         if (this.password) this.password = await Password.hash(this.password);
     }
 
-    @BeforeUpdate()
-    async hashPasswordUpdate(): Promise<void> {
-        if (this.password) this.password = await Password.hash(this.password);
-    }
-
     @ManyToMany(() => Role, (role) => role.users)
     @JoinTable({
         name: 'user_roles',

@@ -35,5 +35,10 @@ export class UserResponseDto {
     constructor(partial: Partial<User>) {
         Object.assign(this, partial);
 
+        if (partial.roles) {
+            this.roles = partial.roles.map(
+                role => new RoleResponseDto(role)
+            );
+        }
     }
 }

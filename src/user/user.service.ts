@@ -52,9 +52,9 @@ export class UserService {
             Object.assign(updateUserDto, {password: await Password.hash(updateUserDto.password)})
         }
 
-        const updatedUser = Object.assign(user, updateUserDto)
-        await this.save(updatedUser)
-
+        Object.assign(user, updateUserDto)
+        const updatedUser = await this.save(user)
+        console.log(updateUserDto.password)
         return new UserResponseDto(updatedUser)
 
     }

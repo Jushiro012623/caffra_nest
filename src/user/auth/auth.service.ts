@@ -1,4 +1,4 @@
-import {Injectable, UnauthorizedException} from '@nestjs/common';
+import {Injectable, Request, UnauthorizedException} from '@nestjs/common';
 import {LoginDto} from "@app/user/auth/dto/login.dto";
 import {UserService} from "@app/user/user.service";
 import {JwtService} from "@nestjs/jwt";
@@ -6,6 +6,7 @@ import {AccessToken, JwtPayload} from "@app/user/auth/auth.types";
 import {RegisterDto} from "@app/user/auth/dto/register.dto";
 import {User} from "@app/user/entities/user.entity";
 import {Password} from "@app/user/helper/password.helper";
+import {UserResponseDto} from "@app/user/dto/user-response.dto";
 
 @Injectable()
 export class AuthService {
@@ -50,9 +51,22 @@ export class AuthService {
         return this.generateAccessToken(user)
     }
 
+    async getProfile(request: { user: JwtPayload }): Promise<UserResponseDto> {
+        const user = await this.userService.findOneBy({
+            where: {id: request.user.sub},
+            relations: ['roles'],
+        });
+
+        if (!user) {
+            throw new UnauthorizedException("Invalid credentials")
+        }
+
+        return new UserResponseDto(user);
+    }
+
     private async generateAccessToken(user: User): Promise<AccessToken> {
 
-        const roles = (await user.roles).map(role => role.slug)
+        const roles = (user.roles).map(role => role.slug)
 
         const accessToken: string = await this.jwtService.signAsync({sub: user.id, roles} as JwtPayload)
 

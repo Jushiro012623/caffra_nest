@@ -3,6 +3,7 @@ import {AppModule} from '@app/app.module';
 import {ValidationPipe} from "@nestjs/common";
 import {appConfig} from "@app/config";
 import {useContainer} from "class-validator";
+import {AuthGuard} from "@app/user/auth/auth.guard";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
