@@ -1,39 +1,5 @@
-import {IsEmail, IsNotEmpty, IsString, MinLength} from "class-validator";
-import {ApiProperty} from "@nestjs/swagger";
-import {IsConfirmed, IsUnique} from "@app/common";
+import {CreateUserDto} from "@app/user/dto/create-user.dto";
 
-export class RegisterDto {
-
-    @IsString()
-    @IsNotEmpty()
-    @MinLength(6)
-    @IsUnique({tableName: 'users', column: 'username'})
-    @ApiProperty({description: 'Username of the user'})
-    username: string;
-
-    @IsString()
-    @IsNotEmpty()
-    @MinLength(5)
-    @ApiProperty({description: 'Password of the user'})
-    @IsConfirmed('confirm_password')
-    password: string;
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty({description: 'Confirm password of the user'})
-    @IsConfirmed('password')
-    confirm_password: string;
-
-    @IsString()
-    @IsNotEmpty()
-    @IsEmail()
-    @ApiProperty({description: 'Email of the user'})
-    @IsUnique({tableName: 'users', column: 'email'})
-    email: string;
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty({description: 'Mobile number of the user'})
-    mobile_number: string;
+export class RegisterDto extends CreateUserDto {
 
 }

@@ -1,18 +1,20 @@
 import {
-    BeforeInsert,
+    AfterInsert,
+    BeforeInsert, BeforeUpdate,
     Column,
     CreateDateColumn,
     DeleteDateColumn,
-    Entity,
+    Entity, JoinTable, ManyToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
 import {Password} from "@app/user/helper/password.helper";
+import {Role} from "@app/user/roles/entities/role.entity";
 
 @Entity({name: 'users'})
 export class User {
     @PrimaryGeneratedColumn()
-    id: number;
+    id: string;
 
     @Column({nullable: false, unique: true})
     username: string;
@@ -38,5 +40,22 @@ export class User {
     @BeforeInsert()
     async hashPassword(): Promise<void> {
         if (this.password) this.password = await Password.hash(this.password);
+    }
+
+    @BeforeUpdate()
+    async hashPasswordUpdate(): Promise<void> {
+        if (this.password) this.password = await Password.hash(this.password);
+    }
+
+    @ManyToMany(() => Role, (role) => role.users)
+    @JoinTable({
+        name: 'user_roles',
+        joinColumn: {name: 'user_id', referencedColumnName: 'id'},
+        inverseJoinColumn: {name: 'role_id', referencedColumnName: 'id'}
+    })
+    roles: Role[];
+
+    async userHasRole(role: string): Promise<boolean> {
+        return (await this.roles).some((r) => r.slug === role);
     }
 }

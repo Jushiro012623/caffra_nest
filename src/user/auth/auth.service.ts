@@ -4,17 +4,13 @@ import {UserService} from "@app/user/user.service";
 import {JwtService} from "@nestjs/jwt";
 import {AccessToken, JwtPayload} from "@app/user/auth/auth.types";
 import {RegisterDto} from "@app/user/auth/dto/register.dto";
-import {InjectRepository} from "@nestjs/typeorm";
 import {User} from "@app/user/entities/user.entity";
-import {Repository} from "typeorm";
 import {Password} from "@app/user/helper/password.helper";
 
 @Injectable()
 export class AuthService {
 
     constructor(
-        @InjectRepository(User)
-        private readonly user: Repository<User>,
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
     ) {
@@ -23,28 +19,46 @@ export class AuthService {
     async login(loginDto: LoginDto): Promise<AccessToken> {
         const {username, password} = loginDto
 
-        const {password: hashedPassword, id} = await this.userService.findOne(username)
+        const user: User | null = await this.userService.findOneBy({
+            where: [
+                {username: username},
+                {email: username},
+                {mobile_number: username}
+            ],
+            relations: ['roles']
+        })
 
-        const passwordMatched = await new Password(password).matches(hashedPassword)
+        if (!user) {
+            throw new UnauthorizedException("Invalid credentials")
+        }
+
+        const passwordMatched = await Password.compare(password, user.password)
         if (!passwordMatched) {
             throw new UnauthorizedException("Invalid credentials")
         }
 
-        return await this.signJwtToken(id.toString())
+        if (Password.needsRehash(user.password)) {
+            user.password = await Password.hash(password);
+            await this.userService.save(user);
+        }
+
+        return this.generateAccessToken(user)
     }
 
-    async register(registerDto: RegisterDto): Promise<any> {
-        const {confirm_password, ...user} = registerDto
-
-        const {id} = await this.user.save(this.user.create(user))
-
-        return await this.signJwtToken(id.toString())
+    async register(registerDto: RegisterDto): Promise<AccessToken> {
+        const user = await this.userService.create(registerDto)
+        return this.generateAccessToken(user)
     }
 
-    private async signJwtToken(sub: string): Promise<AccessToken> {
+    private async generateAccessToken(user: User): Promise<AccessToken> {
+
+        const roles = (await user.roles).map(role => role.slug)
+
+        const accessToken: string = await this.jwtService.signAsync({sub: user.id, roles} as JwtPayload)
+
         return {
             token_type: 'Bearer',
-            access_token: await this.jwtService.signAsync({sub} as JwtPayload),
+            access_token: accessToken
         }
     }
 

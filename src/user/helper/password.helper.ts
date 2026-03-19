@@ -12,8 +12,18 @@ export class Password {
         return bcrypt.hash(plain, saltRounds);
     }
 
-    confirm(confirm_password: string): boolean {
-        return this.plain === confirm_password
+    static async compare(plain: string, hash: string): Promise<boolean> {
+        return bcrypt.compare(plain, hash);
     }
+
+    static needsRehash(hash: string, saltRounds = 10): boolean {
+        const currentRounds = bcrypt.getRounds(hash);
+        return currentRounds < saltRounds;
+    }
+
+    static mask(password: string): string {
+        return '*'.repeat(password.length);
+    }
+
 }
 
