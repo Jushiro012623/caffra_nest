@@ -13,6 +13,7 @@ import { RolesModule } from '@app/user/roles/roles.module';
 import { AuthGuard } from '@app/user/auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from '@app/user/roles/roles.guard';
+import { ProductModule } from './product/product.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RolesGuard } from '@app/user/roles/roles.guard';
     UserModule,
     AuthModule,
     RolesModule,
+    ProductModule,
   ],
   controllers: [],
   providers: [

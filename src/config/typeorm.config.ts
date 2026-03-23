@@ -4,6 +4,8 @@ import { DataSourceOptions } from 'typeorm';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { User } from '@app/user/entities/user.entity';
 import { Role } from '@app/user/roles/entities/role.entity';
+import {Product} from "@app/product/entities/product.entity";
+import {Category} from "@app/category/entities/category.entity";
 
 const env: Record<string, string | undefined> = process.env;
 
@@ -19,7 +21,7 @@ export const databaseSource = (): DataSourceOptions => {
     database: env.DB_NAME || 'nestjs',
     synchronize: false,
     migrationsRun: false,
-    entities: [User, Role],
+    entities: [User, Role, Product, Category],
     migrations: ['dist/typeorm/migration/*.js'],
   };
 };
