@@ -3,10 +3,10 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {FindOneOptions, In, Repository} from "typeorm";
 import {User} from "@app/user/entities/user.entity";
 import {CreateUserDto} from "@app/user/dto/create-user.dto";
-import {Password} from "@app/user/helper/password.helper";
 import {RolesService} from "@app/user/roles/roles.service";
 import {UserResponseDto} from "@app/user/dto/user-response.dto";
 import {UpdateUserDto} from "@app/user/dto/update-user.dto";
+import {Hasher} from "@app/common/utils/hasher.util";
 
 @Injectable()
 export class UserService {
@@ -51,7 +51,7 @@ export class UserService {
         }
 
         if (dto.password) {
-            Object.assign(dto, {password: await Password.hash(dto.password)})
+            Object.assign(dto, {password: await Hasher.hash(dto.password)})
         }
         Object.assign(user, dto)
         const updatedUser = await this.save(user)
