@@ -42,17 +42,18 @@ export class UserService {
 
     async update(id: string, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
         const user = await this.findOneBy({where: {id}})
+
         if (!user) throw new NotFoundException('User not found')
 
-        if (updateUserDto.roles) {
-            Object.assign(updateUserDto, {roles: await this.roleService.resolveRoles(updateUserDto.roles)})
+        const {confirm_password, ...dto} = updateUserDto
+        if (dto.roles) {
+            Object.assign(dto, {roles: await this.roleService.resolveRoles(dto.roles)})
         }
 
-        if (updateUserDto.password) {
-            Object.assign(updateUserDto, {password: await Password.hash(updateUserDto.password)})
+        if (dto.password) {
+            Object.assign(dto, {password: await Password.hash(dto.password)})
         }
-
-        Object.assign(user, updateUserDto)
+        Object.assign(user, dto)
         const updatedUser = await this.save(user)
 
         return new UserResponseDto(updatedUser)

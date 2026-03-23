@@ -12,8 +12,7 @@ import {LoginDto} from "@app/user/auth/dto/login.dto";
 import {AccessToken, JwtPayload} from "@app/user/auth/auth.types";
 import {RegisterDto} from "@app/user/auth/dto/register.dto";
 import {UserResponseDto} from "@app/user/dto/user-response.dto";
-import {User} from "@app/user/entities/user.entity";
-import {AuthGuard, Public} from "@app/user/auth/auth.guard";
+import {Public} from "@app/user/auth/decorators/auth.decorator";
 
 @Controller('auth')
 export class AuthController {

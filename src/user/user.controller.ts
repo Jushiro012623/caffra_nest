@@ -1,20 +1,24 @@
 import {
     Body,
     ClassSerializerInterceptor,
-    Controller, Delete,
+    Controller,
+    Delete,
     Get,
-    Param, Patch,
+    Param,
+    Patch,
     Post,
     SerializeOptions,
     UseInterceptors
 } from '@nestjs/common';
 import {UserService} from "@app/user/user.service";
-import {User} from "@app/user/entities/user.entity";
 import {UserResponseDto} from "@app/user/dto/user-response.dto";
 import {CreateUserDto} from "@app/user/dto/create-user.dto";
 import {UpdateUserDto} from "@app/user/dto/update-user.dto";
+import {Roles} from "@app/user/roles/decorators/roles.decorator";
+import {RoleEnum} from "@app/user/roles/enums/role.enum";
 
 @UseInterceptors(ClassSerializerInterceptor)
+@Roles(RoleEnum.Admin)
 @Controller('users')
 export class UserController {
     constructor(

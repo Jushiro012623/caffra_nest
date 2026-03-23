@@ -8,6 +8,7 @@ import {IsConfirmedValidator, IsUniqueConstraintValidator, IsExistsValidator} fr
 import {RolesModule} from "@app/user/roles/roles.module";
 import {AuthGuard} from "@app/user/auth/auth.guard";
 import {APP_GUARD} from "@nestjs/core";
+import {RolesGuard} from "@app/user/roles/roles.guard";
 
 @Module({
     imports: [
@@ -26,7 +27,12 @@ import {APP_GUARD} from "@nestjs/core";
         {
             provide: APP_GUARD,
             useClass: AuthGuard,
-        },],
+        },
+        {
+            provide: APP_GUARD,
+            useClass: RolesGuard,
+        },
+    ],
 })
 export class AppModule {
 }

@@ -8,8 +8,8 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import {Password} from "@app/user/helper/password.helper";
 import {Role} from "@app/user/roles/entities/role.entity";
+import {Hasher} from "@app/common/utils/hasher.util";
 
 @Entity({name: 'users'})
 export class User {
@@ -39,7 +39,7 @@ export class User {
 
     @BeforeInsert()
     async hashPassword(): Promise<void> {
-        if (this.password) this.password = await Password.hash(this.password);
+        if (this.password) this.password = await Hasher.hash(this.password);
     }
 
     @ManyToMany(() => Role, (role) => role.users)

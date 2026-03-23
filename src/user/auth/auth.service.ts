@@ -5,8 +5,8 @@ import {JwtService} from "@nestjs/jwt";
 import {AccessToken, JwtPayload} from "@app/user/auth/auth.types";
 import {RegisterDto} from "@app/user/auth/dto/register.dto";
 import {User} from "@app/user/entities/user.entity";
-import {Password} from "@app/user/helper/password.helper";
 import {UserResponseDto} from "@app/user/dto/user-response.dto";
+import {Hasher} from "@app/common/utils/hasher.util";
 
 @Injectable()
 export class AuthService {
@@ -33,13 +33,13 @@ export class AuthService {
             throw new UnauthorizedException("Invalid credentials")
         }
 
-        const passwordMatched = await Password.compare(password, user.password)
+        const passwordMatched = await Hasher.compare(password, user.password)
         if (!passwordMatched) {
             throw new UnauthorizedException("Invalid credentials")
         }
 
-        if (Password.needsRehash(user.password)) {
-            user.password = await Password.hash(password);
+        if (Hasher.needsRehash(user.password)) {
+            user.password = await Hasher.hash(password);
             await this.userService.save(user);
         }
 
