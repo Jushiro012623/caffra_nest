@@ -1,3 +1,3 @@
-export * from './app.config'
-export * from './jwt.config'
-export * from './typeorm.config'
+export * from './app.config';
+export * from './jwt.config';
+export * from './typeorm.config';

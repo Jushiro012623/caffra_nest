@@ -1,44 +1,40 @@
-import {Exclude, Expose} from "class-transformer";
-import {User} from "@app/user/entities/user.entity";
-import {Role} from "@app/user/roles/entities/role.entity";
-import {RoleResponseDto} from "@app/user/roles/entities/role-response.dto";
+import { Exclude, Expose } from 'class-transformer';
+import { User } from '@app/user/entities/user.entity';
+import { RoleResponseDto } from '@app/user/roles/entities/role-response.dto';
 
 export class UserResponseDto {
+  @Expose()
+  id: string;
 
-    @Expose()
-    id: string;
+  @Expose()
+  username: string;
 
-    @Expose()
-    username: string;
+  @Expose()
+  email: string;
 
-    @Expose()
-    email: string;
+  @Expose()
+  mobile_number: string;
 
-    @Expose()
-    mobile_number: string;
+  @Expose()
+  roles?: RoleResponseDto[];
 
-    @Expose()
-    roles?: RoleResponseDto[];
+  @Expose({ groups: ['timestamps'] })
+  created_at: Date;
 
-    @Expose({groups: ['timestamps']})
-    created_at: Date;
+  @Expose({ groups: ['timestamps'] })
+  updated_at: Date;
 
-    @Expose({groups: ['timestamps']})
-    updated_at: Date;
+  @Exclude()
+  deleted_at?: Date;
 
-    @Exclude()
-    deleted_at?: Date;
+  @Exclude()
+  password?: string;
 
-    @Exclude()
-    password?: string;
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
 
-    constructor(partial: Partial<User>) {
-        Object.assign(this, partial);
-
-        if (partial.roles) {
-            this.roles = partial.roles.map(
-                role => new RoleResponseDto(role)
-            );
-        }
+    if (partial.roles) {
+      this.roles = partial.roles.map((role) => new RoleResponseDto(role));
     }
+  }
 }

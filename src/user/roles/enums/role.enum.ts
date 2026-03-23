@@ -1,4 +1,4 @@
 export enum RoleEnum {
-    Cashier = 'cashier',
-    Admin = 'admin',
+  Cashier = 'cashier',
+  Admin = 'admin',
 }
