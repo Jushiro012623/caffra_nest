@@ -1,57 +1,27 @@
-import {
-  BeforeInsert,
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Role } from '@app/user/roles/entities/role.entity';
-import { Hasher } from '@app/common/utils/hasher.util';
+import {BeforeInsert, Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import * as bcrypt from 'bcrypt';
+import {Expose} from "class-transformer";
+import {ApiProperty} from "@nestjs/swagger";
 
-@Entity({ name: 'users' })
+@Entity({name: 'users'})
 export class User {
-  @PrimaryGeneratedColumn()
-  id: string;
+    @ApiProperty({description: 'User id'})
+    @PrimaryGeneratedColumn()
+    id: string;
 
-  @Column({ nullable: false, unique: true })
-  username: string;
+    @ApiProperty({description: 'User username'})
+    @Column({type: 'varchar', nullable: false, unique: true})
+    username: string;
 
-  @Column({ nullable: false })
-  password: string;
+    @ApiProperty({description: 'User password'})
+    @Column({type: 'varchar', nullable: false})
+    password: string;
 
-  @Column({ nullable: false, unique: true })
-  email: string;
+    @ApiProperty({description: 'User email'})
+    @Column({type: 'varchar', nullable: false, unique: true})
+    email: string;
 
-  @Column({ nullable: false })
-  mobile_number: string;
-
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
-
-  @DeleteDateColumn()
-  deleted_at?: Date;
-
-  @BeforeInsert()
-  async hashPassword(): Promise<void> {
-    if (this.password) this.password = await Hasher.hash(this.password);
-  }
-
-  @ManyToMany(() => Role, (role) => role.users)
-  @JoinTable({
-    name: 'user_roles',
-    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' },
-  })
-  roles: Role[];
-
-  userHasRole(role: string): boolean {
-    return this.roles.some((r) => r.slug === role);
-  }
+    @ApiProperty({description: 'User mobile number'})
+    @Column({type: 'varchar', nullable: false, unique: true})
+    mobile_number: string;
 }

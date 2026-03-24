@@ -1,45 +1,29 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { UserModule } from '@app/user/user.module';
-import { AuthModule } from '@app/user/auth/auth.module';
-import { appConfig, jwtConfig, typeormConfig } from '@app/config';
-import {
-  IsConfirmedValidator,
-  IsUniqueConstraintValidator,
-  IsExistsValidator,
-} from '@app/common';
-import { RolesModule } from '@app/user/roles/roles.module';
-import { AuthGuard } from '@app/user/auth/auth.guard';
-import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from '@app/user/roles/roles.guard';
-import { ProductModule } from './product/product.module';
+import {Module} from '@nestjs/common';
+import {TypeOrmModule} from '@nestjs/typeorm';
+import {ConfigModule} from '@nestjs/config';
+import {appConfig, jwtConfig, typeormConfig} from '@app/config';
+import {AuthModule} from "@app/auth/auth.module";
+import { UserModule } from './user/user.module';
+import { CryptoModule } from './crypto/crypto.module';
+import {IsConfirmedValidator, IsExistsValidator, IsUniqueConstraintValidator} from "@app/common/validators";
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [appConfig, typeormConfig, jwtConfig],
-    }),
-    TypeOrmModule.forRoot(typeormConfig()),
-    UserModule,
-    AuthModule,
-    RolesModule,
-    ProductModule,
-  ],
-  controllers: [],
-  providers: [
-    IsUniqueConstraintValidator,
-    IsConfirmedValidator,
-    IsExistsValidator,
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
-  ],
+    imports: [
+        ConfigModule.forRoot({
+            isGlobal: true,
+            load: [appConfig, typeormConfig, jwtConfig],
+        }),
+        TypeOrmModule.forRoot(typeormConfig()),
+        AuthModule,
+        UserModule,
+        CryptoModule,
+    ],
+    controllers: [],
+    providers: [
+        IsUniqueConstraintValidator,
+        IsConfirmedValidator,
+        IsExistsValidator,
+    ],
 })
-export class AppModule {}
+export class AppModule {
+}
