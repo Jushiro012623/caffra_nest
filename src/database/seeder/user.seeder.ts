@@ -7,22 +7,22 @@ export class UserSeeder implements Seeder {
   constructor(private readonly entityManager: EntityManager) {}
 
   async seed(): Promise<void> {
-    const now: Date = new Date();
+    // const now: Date = new Date();
 
-    const roleData = [
-      {
-        name: 'Admin',
-        slug: 'admin',
-        created_at: now,
-        updated_at: now,
-      },
-      {
-        name: 'Cashier',
-        slug: 'cashier',
-        created_at: now,
-        updated_at: now,
-      },
-    ];
+    // const roleData = [
+    //   {
+    //     name: 'Admin',
+    //     slug: 'admin',
+    //     created_at: now,
+    //     updated_at: now,
+    //   },
+    //   {
+    //     name: 'Cashier',
+    //     slug: 'cashier',
+    //     created_at: now,
+    //     updated_at: now,
+    //   },
+    // ];
 
     const userData = {
       username: 'dshivan',

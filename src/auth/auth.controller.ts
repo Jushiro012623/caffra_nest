@@ -1,41 +1,41 @@
 import {
-    Body,
-    Controller,
-    Get,
-    Post,
-    UseGuards,
-    ClassSerializerInterceptor,
-    Request,
-    UseInterceptors,
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  ClassSerializerInterceptor,
+  Request,
+  UseInterceptors,
 } from '@nestjs/common';
-import {AuthService} from '@app/auth/auth.service';
-import {LoginUserDto} from '@app/auth/dto/login-user.dto';
-import {RegisterUserDto} from '@app/auth/dto/register-user.dto';
-import {AuthGuard} from '@app/auth/guard/auth.guard';
-import {User} from "@app/user/entities/user.entity";
-import type {AccessToken, AuthRequest} from "@app/common/types/auth.types";
+import { AuthService } from '@app/auth/auth.service';
+import { LoginUserDto } from '@app/auth/dto/login-user.dto';
+import { RegisterUserDto } from '@app/auth/dto/register-user.dto';
+import { AuthGuard } from '@app/auth/guard/auth.guard';
+import { User } from '@app/user/entities/user.entity';
+import type { AccessToken, AuthRequest } from '@app/common/types/auth.types';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {
-    }
+  constructor(private readonly authService: AuthService) {}
 
-    @Post('/login')
-    login(@Body() payload: LoginUserDto): Promise<AccessToken> {
-        return this.authService.login(payload);
-    }
+  @Post('/login')
+  login(@Body() payload: LoginUserDto): Promise<AccessToken> {
+    return this.authService.login(payload);
+  }
 
-    @Post('/register')
-    register(@Body() payload: RegisterUserDto, @Request() request: AuthRequest): Promise<AccessToken> {
-        return this.authService.register(payload, request);
-    }
+  @Post('/register')
+  register(
+    @Body() payload: RegisterUserDto,
+    @Request() request: AuthRequest,
+  ): Promise<AccessToken> {
+    return this.authService.register(payload, request);
+  }
 
-    @Get('/user')
-    @UseGuards(AuthGuard)
-    @UseInterceptors(ClassSerializerInterceptor)
-    getUser(
-        @Request() request: { user: { sub: string } },
-    ): Promise<User> {
-        return this.authService.getAuthUser(request.user.sub);
-    }
+  @Get('/user')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  getUser(@Request() request: { user: { sub: string } }): Promise<User> {
+    return this.authService.getAuthUser(request.user.sub);
+  }
 }
