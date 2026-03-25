@@ -2,7 +2,7 @@ import { registerAs } from '@nestjs/config';
 import 'dotenv/config';
 import { DataSourceOptions } from 'typeorm';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import {User} from "@app/user/entities/user.entity";
+import { User } from '@app/user/entities/user.entity';
 
 const env: Record<string, string | undefined> = process.env;
 

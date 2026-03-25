@@ -2,7 +2,7 @@ import { registerAs } from '@nestjs/config';
 
 type AppEnv = 'local' | 'staging' | 'production';
 
-type AppConfig = {
+export type AppConfig = {
   env: AppEnv;
   name: string;
   port: number;

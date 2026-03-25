@@ -1,11 +1,8 @@
-import {seeder} from 'nestjs-seeder';
-import {TypeOrmModule} from '@nestjs/typeorm';
-import {UserSeeder} from '@app/database/seeder/user.seeder';
-import {typeormConfig} from '@app/config';
-import {User} from "@app/user/entities/user.entity";
+import { seeder } from 'nestjs-seeder';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserSeeder } from '@app/database/seeder/user.seeder';
+import { typeormConfig } from '@app/config';
 
 seeder({
-    imports: [
-        TypeOrmModule.forRoot(typeormConfig()),
-    ],
+  imports: [TypeOrmModule.forRoot(typeormConfig())],
 }).run([UserSeeder]);
