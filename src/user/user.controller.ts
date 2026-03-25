@@ -1,11 +1,24 @@
-import {Body, ClassSerializerInterceptor, Controller, Get, Param, Patch, Post, UseInterceptors} from '@nestjs/common';
+import {
+    Body,
+    ClassSerializerInterceptor,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Patch,
+    Post, Request, SerializeOptions, UseGuards,
+    UseInterceptors
+} from '@nestjs/common';
 import {UserService} from "@app/user/user.service";
 import {User} from "@app/user/entities/user.entity";
 import {CreateUserDto} from "@app/user/dto/create-user.dto";
 import {UpdateUserDto} from "@app/user/dto/update-user.dto";
+import type {AuthRequest} from "@app/common/types/auth.types";
+import {AuthGuard} from "@app/auth/guard/auth.guard";
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
+@UseGuards(AuthGuard)
 export class UserController {
     constructor(
         private readonly userService: UserService,
@@ -18,6 +31,7 @@ export class UserController {
     }
 
     @Get('/:id')
+    @SerializeOptions({groups: ['timestamps']})
     findOne(
         @Param('id') id: string
     ): Promise<User> {
@@ -25,18 +39,30 @@ export class UserController {
     }
 
     @Post('/')
+    @SerializeOptions({groups: ['timestamps']})
     create(
-        @Body() createUserDto: CreateUserDto
+        @Body() payload: CreateUserDto,
+        @Request() request: AuthRequest
     ): Promise<User> {
-        return this.userService.create(createUserDto);
+        return this.userService.create(payload, request);
     }
 
     @Patch('/:id')
+    @SerializeOptions({groups: ['timestamps']})
     update(
         @Param('id') id: string,
-        @Body() updateUserDto: UpdateUserDto
+        @Body() payload: UpdateUserDto,
+        @Request() request: AuthRequest
     ): Promise<User> {
-        return this.userService.update(id, updateUserDto);
+        return this.userService.update(id, payload, request);
+    }
+
+    @Delete('/:id')
+    delete(
+        @Param('id') id: string,
+        @Request() request: AuthRequest
+    ): Promise<void> {
+        return this.userService.delete(id, request);
     }
 
 }

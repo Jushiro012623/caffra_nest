@@ -3,35 +3,47 @@ import {UserService} from '@app/user/user.service';
 import {LoginUserDto} from '@app/auth/dto/login-user.dto';
 import {User} from '@app/user/entities/user.entity';
 import {RegisterUserDto} from '@app/auth/dto/register-user.dto';
-import {IdentifierResolver, UserLookupCriteria} from '@app/auth/utils/identifier-resolver';
+import {IdentifierResolver, UserIdentifierType} from '@app/auth/utils/identifier-resolver';
 import {HashService} from '@app/crypto/hash.service';
-import {AccessToken, JwtService} from '@app/auth/jwt/jwt.service';
 import {ResponseUserDto} from '@app/user/dto/response-user.dto';
+import {LoggerService} from "@app/common/logger/logger.service";
+import {JwtService} from "@app/auth/jwt/jwt.service";
+import {AccessToken, AuthRequest} from "@app/common/types/auth.types";
+import type {Request} from "express";
 
 @Injectable()
 export class AuthService {
+
+
     constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
         private readonly hashService: HashService,
+        private logger: LoggerService,
     ) {
+        this.logger.setContext(AuthService.name)
     }
 
-    async login(loginUserDto: LoginUserDto): Promise<AccessToken> {
-        const {username: identifier, password} = loginUserDto;
+    async login(payload: LoginUserDto): Promise<AccessToken> {
+        const {username: identifier, password} = payload;
 
-        const loginIdentifier: UserLookupCriteria = IdentifierResolver.resolve(identifier);
-        const user: User | null = await this.userService.findOneBy(loginIdentifier);
+        const loginIdentifier: IdentifierResolver = new IdentifierResolver(identifier);
+        const user: User | null = await this.userService.findOneBy(loginIdentifier.resolve());
         if (!user) throw new UnauthorizedException('Invalid credentials');
 
         await this.assertPasswordMatches(password, user.password);
-        await this.rehashPasswordIfNeeded(user);
+        await this.rehashPasswordIfNeeded(user, password);
 
+        const identifierValue: string = this.hashService.mask(identifier, {end: -4})
+        const identifierKey: UserIdentifierType = loginIdentifier.getKey();
+
+        this.logger.log(`AUTH_LOGIN_SUCCESS`, {id: user.id, identifierValue, identifierKey});
         return this.jwtService.issueAccessToken({sub: user.id});
     }
 
-    async register(registerUserDto: RegisterUserDto): Promise<AccessToken> {
-        const user: User = await this.userService.create(registerUserDto);
+    async register(payload: RegisterUserDto, request: AuthRequest): Promise<AccessToken> {
+        const user: User = await this.userService.create(payload, request);
+        this.logger.log(`AUTH_REGISTER_SUCCESS`, {id: user.id});
         return this.jwtService.issueAccessToken({sub: user.id});
     }
 
@@ -45,20 +57,23 @@ export class AuthService {
         password: string,
         hashedPassword: string,
     ): Promise<void> {
-        const isPasswordValid: boolean = await this.hashService.compare(
-            password,
-            hashedPassword,
-        );
+        const isPasswordValid: boolean = await this.hashService.compare(password, hashedPassword);
         if (!isPasswordValid) {
             throw new UnauthorizedException('Invalid credentials');
         }
     }
 
-    private async rehashPasswordIfNeeded(user: User): Promise<void> {
+    private async rehashPasswordIfNeeded(user: User, password: string): Promise<void> {
         const needsRehash: boolean = this.hashService.needsRehash(user.password);
-        if (needsRehash) {
-            user.password = await this.hashService.hash(user.password);
-            await this.userService.save(user);
-        }
+        if (!needsRehash) return;
+
+        const emailHint: string = this.hashService.mask(user.email, {start: 1, end: -10})
+
+        this.logger.warn('AUTH_PASSWORD_NEEDS_REHASHING', {id: user.id, emailHint});
+
+        user.password = await this.hashService.hash(password);
+        await this.userService.save(user)
+
+        this.logger.log('AUTH_PASSWORD_REHASHED', {id: user.id, emailHint})
     }
 }
