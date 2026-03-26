@@ -16,5 +16,4 @@ export class HashService {
   needsRehash(hash: string): boolean {
     return bcrypt.getRounds(hash) !== this.SALT_ROUNDS;
   }
-
 }

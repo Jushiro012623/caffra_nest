@@ -1,24 +1,13 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '@app/user/entities/user.entity';
-import {
-  FindOneOptions,
-  FindOptions,
-  FindOptionsWhere,
-  In,
-  Repository,
-} from 'typeorm';
+import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { HashService } from '@app/crypto/hash.service';
 import { ResponseUserDto } from '@app/user/dto/response-user.dto';
 import { CreateUserDto } from '@app/user/dto/create-user.dto';
 import { UpdateUserDto } from '@app/user/dto/update-user.dto';
 import { LoggerService } from '@app/common/logger/logger.service';
 import type { AuthRequest } from '@app/common/types/auth.types';
-import { Role } from '@app/role/entities/role.entity';
 import { RoleService } from '@app/role/role.service';
 
 @Injectable()

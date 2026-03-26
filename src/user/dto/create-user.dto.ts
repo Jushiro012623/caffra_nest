@@ -7,7 +7,7 @@ import {
   Length,
   MinLength,
 } from 'class-validator';
-import { IsConfirmed, IsExists, IsUnique } from '@app/common/validators';
+import { IsConfirmed, IsUnique } from '@app/common/validators';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {

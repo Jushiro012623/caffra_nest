@@ -38,7 +38,7 @@ export class RoleService {
     this.logger.log('ROLE_CREATED_SUCCESS', {
       id: createdRole.id,
       role: createdRole.name,
-      actorId: request.user.id,
+      actorId: request.user.id as string,
     });
     return createdRole;
   }
@@ -55,7 +55,7 @@ export class RoleService {
     this.logger.log('ROLE_UPDATED_SUCCESS', {
       id,
       role: updatedRole.name,
-      actorId: request.user.id,
+      actorId: request.user.id as string,
     });
     return updatedRole;
   }
@@ -64,7 +64,10 @@ export class RoleService {
     const role: Role | null = await this.findOneBy({ id });
     if (!role) throw new NotFoundException('Role Not found');
     await this.roleRepository.remove(role);
-    this.logger.log('ROLE_DELETED_SUCCESS', { id, actorId: request.user.id });
+    this.logger.log('ROLE_DELETED_SUCCESS', {
+      id,
+      actorId: request.user.id as string,
+    });
   }
 
   async findOneBy(
