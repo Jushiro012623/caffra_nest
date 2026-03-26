@@ -16,7 +16,7 @@ import { UserService } from '@app/user/user.service';
 import { User } from '@app/user/entities/user.entity';
 import { CreateUserDto } from '@app/user/dto/create-user.dto';
 import { UpdateUserDto } from '@app/user/dto/update-user.dto';
-import type { AuthRequest } from '@app/common/types/auth.types';
+import type { AuthRequest } from '@app/common/types/request.type';
 import { AuthGuard } from '@app/auth/guard/auth.guard';
 
 @Controller('users')

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService as JWTS } from '@nestjs/jwt';
 import { JwtPayload } from 'jsonwebtoken';
-import { AccessToken } from '@app/common/types/auth.types';
+import { AccessToken } from '@app/common/types/response.type';
 
 @Injectable()
 export class JwtService {

@@ -14,7 +14,7 @@ import {
 import { Role } from '@app/role/entities/role.entity';
 import { RoleService } from '@app/role/role.service';
 import { CreateRoleDto } from '@app/role/dto/create-role.dto';
-import type { AuthRequest } from '@app/common/types/auth.types';
+import type { AuthRequest } from '@app/common/types/request.type';
 import { AuthGuard } from '@app/auth/guard/auth.guard';
 import { UpdateRoleDto } from '@app/role/dto/update-role.dto';
 

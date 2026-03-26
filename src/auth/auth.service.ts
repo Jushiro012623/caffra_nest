@@ -11,7 +11,8 @@ import { HashService } from '@app/crypto/hash.service';
 import { ResponseUserDto } from '@app/user/dto/response-user.dto';
 import { LoggerService } from '@app/common/logger/logger.service';
 import { JwtService } from '@app/auth/jwt/jwt.service';
-import { AccessToken, AuthRequest } from '@app/common/types/auth.types';
+import type { AccessToken } from '@app/common/types/response.type';
+import type { AuthRequest } from '@app/common/types/request.type'
 import { StringFormatter } from '@app/common/utils/string-formatter.utils';
 
 @Injectable()

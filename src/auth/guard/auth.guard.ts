@@ -7,7 +7,7 @@ import {
 import { IS_PUBLIC_KEY } from '@app/auth/decorators/public.decorator';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@app/auth/jwt/jwt.service';
-import { AuthRequest } from '@app/common/types/auth.types';
+import type { AuthRequest } from '@app/common/types/request.type';
 import { LoggerService } from '@app/common/logger/logger.service';
 import { StringFormatter } from '@app/common/utils/string-formatter.utils';
 
