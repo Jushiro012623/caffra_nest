@@ -3,6 +3,7 @@ import {
   IsArray,
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Length,
   MinLength,
@@ -42,7 +43,8 @@ export class CreateUserDto {
   @ApiProperty({ description: 'User password confirmation' })
   password_confirmation: string;
 
+  @IsOptional()
   @IsArray()
   @ArrayNotEmpty()
-  roleIds: string[];
+  roleIds?: string[];
 }

@@ -12,7 +12,7 @@ import { ResponseUserDto } from '@app/user/dto/response-user.dto';
 import { LoggerService } from '@app/common/logger/logger.service';
 import { JwtService } from '@app/auth/jwt/jwt.service';
 import type { AccessToken } from '@app/common/types/response.type';
-import type { AuthRequest } from '@app/common/types/request.type'
+import type { AuthRequest } from '@app/common/types/request.type';
 import { StringFormatter } from '@app/common/utils/string-formatter.utils';
 
 @Injectable()
@@ -29,16 +29,24 @@ export class AuthService {
   async login(payload: LoginUserDto): Promise<AccessToken> {
     const { username: identifier, password } = payload;
 
-    const loginIdentifier: IdentifierResolver = new IdentifierResolver(
-      identifier,
-    );
+    const loginIdentifier = new IdentifierResolver(identifier);
     const user: User | null = await this.userService.findOneBy(
       loginIdentifier.resolve(),
       { relations: ['roles'] },
     );
-    if (!user) throw new UnauthorizedException('Invalid credentials');
 
-    await this.assertPasswordMatches(password, user.password);
+    const DUMMY_HASH = '$2b$10$invalidsaltinvalidsaltinv.u';
+
+    const hashToCompare = user?.password ?? DUMMY_HASH;
+    const isValid = await this.hashService.compare(password, hashToCompare);
+
+    if (!user || !isValid) {
+      this.logger.warn('AUTH_LOGIN_FAILED', {
+        identifier: StringFormatter.mask(identifier, { end: -4 }),
+      });
+
+      throw new UnauthorizedException('Invalid credentials');
+    }
     await this.rehashPasswordIfNeeded(user, password);
 
     const identifierValue: string = StringFormatter.mask(identifier, {
@@ -68,25 +76,17 @@ export class AuthService {
     return this.jwtService.issueAccessToken({ sub: user.id, roles });
   }
 
-  async getAuthUser(id: string): Promise<User> {
-    const user: User | null = await this.userService.findOneBy({ id });
-    if (user) return new ResponseUserDto(user);
-
-    this.logger.warn(`AUTH_TOKEN_USER_MISMATCH`, { id });
-    throw new UnauthorizedException('User not found');
-  }
-
-  private async assertPasswordMatches(
-    password: string,
-    hashedPassword: string,
-  ): Promise<void> {
-    const isPasswordValid: boolean = await this.hashService.compare(
-      password,
-      hashedPassword,
+  async getAuthUser(id: string): Promise<ResponseUserDto> {
+    const user: User | null = await this.userService.findOneBy(
+      { id },
+      { relations: ['roles'] },
     );
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+    if (!user) {
+      this.logger.warn('AUTH_TOKEN_USER_MISMATCH', { id });
+      throw new UnauthorizedException('User not found');
     }
+
+    return new ResponseUserDto(user);
   }
 
   private async rehashPasswordIfNeeded(

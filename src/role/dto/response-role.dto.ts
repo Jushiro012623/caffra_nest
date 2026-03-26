@@ -11,10 +11,10 @@ export class ResponseRoleDto {
   @Expose()
   slug: string;
 
-  @Expose({ groups: ['timestamp'] })
+  @Expose({ groups: ['timestamps'] })
   created_at: Date;
 
-  @Expose({ groups: ['timestamp'] })
+  @Expose({ groups: ['timestamps'] })
   updated_at: Date;
 
   @Exclude()

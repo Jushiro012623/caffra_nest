@@ -46,7 +46,7 @@ export class AuthGuard implements CanActivate {
         error instanceof Error ? error.message : 'Token verification failed';
       message = StringFormatter.toTitleCase(message);
 
-      this.logger.warn('AUTH_TOKEN_VERIFICATION_FAILED', { error });
+      this.logger.warn('AUTH_TOKEN_VERIFICATION_FAILED', { token: error });
       throw new UnauthorizedException(message);
     }
     return true;

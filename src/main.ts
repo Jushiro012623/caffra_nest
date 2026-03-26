@@ -4,7 +4,6 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { appConfig } from '@app/config';
 import { useContainer } from 'class-validator';
 import helmet from 'helmet';
-import { LoggerService } from '@app/common/logger/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,11 +12,15 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
-
-  app.useLogger(new LoggerService());
 
   const { port } = appConfig();
   await app.listen(port);

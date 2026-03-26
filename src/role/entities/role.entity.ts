@@ -28,5 +28,5 @@ export class Role {
   deleted_at?: Date;
 
   @ManyToMany((): typeof User => User, (user: User) => user.roles)
-  users: User[];
+  users?: User[];
 }
