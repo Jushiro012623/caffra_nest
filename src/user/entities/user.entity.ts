@@ -1,5 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from '@app/role/entities/role.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -34,4 +42,12 @@ export class User {
   @ApiProperty({ description: 'User deleted at' })
   @Column({ type: 'timestamp', nullable: true })
   deleted_at?: Date;
+
+  @ManyToMany((): typeof Role => Role, (role: Role) => role.users)
+  @JoinTable({
+    name: 'user_roles',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' },
+  })
+  roles: Role[];
 }

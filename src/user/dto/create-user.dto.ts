@@ -1,11 +1,13 @@
 import {
+  ArrayNotEmpty,
+  IsArray,
   IsEmail,
   IsNotEmpty,
   IsString,
   Length,
   MinLength,
 } from 'class-validator';
-import { IsConfirmed, IsUnique } from '@app/common/validators';
+import { IsConfirmed, IsExists, IsUnique } from '@app/common/validators';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
@@ -39,4 +41,8 @@ export class CreateUserDto {
   @IsConfirmed('password')
   @ApiProperty({ description: 'User password confirmation' })
   password_confirmation: string;
+
+  @IsArray()
+  @ArrayNotEmpty()
+  roleIds: string[];
 }

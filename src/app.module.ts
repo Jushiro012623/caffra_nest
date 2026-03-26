@@ -12,6 +12,7 @@ import { UserModule } from '@app/user/user.module';
 import { CryptoModule } from '@app/crypto/crypto.module';
 import { LoggerService } from './common/logger/logger.service';
 import { LoggerModule } from './common/logger/logger.module';
+import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { LoggerModule } from './common/logger/logger.module';
     UserModule,
     CryptoModule,
     LoggerModule,
+    RoleModule,
   ],
   controllers: [],
   providers: [

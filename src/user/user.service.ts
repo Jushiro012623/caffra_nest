@@ -1,13 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '@app/user/entities/user.entity';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import {
+  FindOneOptions,
+  FindOptions,
+  FindOptionsWhere,
+  In,
+  Repository,
+} from 'typeorm';
 import { HashService } from '@app/crypto/hash.service';
 import { ResponseUserDto } from '@app/user/dto/response-user.dto';
 import { CreateUserDto } from '@app/user/dto/create-user.dto';
 import { UpdateUserDto } from '@app/user/dto/update-user.dto';
 import { LoggerService } from '@app/common/logger/logger.service';
 import type { AuthRequest } from '@app/common/types/auth.types';
+import { Role } from '@app/role/entities/role.entity';
+import { RoleService } from '@app/role/role.service';
 
 @Injectable()
 export class UserService {
@@ -15,13 +27,16 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly hashService: HashService,
+    private readonly roleService: RoleService,
     private logger: LoggerService,
   ) {
     this.logger.setContext(UserService.name);
   }
 
   async findAll(): Promise<User[]> {
-    const users: User[] = await this.userRepository.find();
+    const users: User[] = await this.userRepository.find({
+      relations: ['roles'],
+    });
     return users.map(
       (user: User): ResponseUserDto => new ResponseUserDto(user),
     );
@@ -35,13 +50,13 @@ export class UserService {
     return new ResponseUserDto(user);
   }
 
-  async create(payload: CreateUserDto, request: AuthRequest): Promise<User> {
+  async create(payload: CreateUserDto, request?: AuthRequest): Promise<User> {
     const user: User = this.userRepository.create(payload);
 
-    const hashPassword: string = await this.hashService.hash(user.password);
-    Object.assign(user, { password: hashPassword });
+    user.password = await this.hashService.hash(user.password);
+    user.roles = await this.roleService.resolveRoles(payload.roleIds);
 
-    const createUser: User = await this.save(user);
+    const createUser: User = await this.userRepository.save(user);
     this.logger.log('USER_CREATED_SUCCESS', {
       id: createUser.id,
       actorId: request?.user?.sub || createUser.id,
@@ -62,10 +77,10 @@ export class UserService {
 
     Object.assign(user, payload);
 
-    const updatedUser: User = await this.save(user);
+    const updatedUser: User = await this.userRepository.save(user);
     this.logger.log('USER_UPDATED_SUCCESS', {
-      id: updatedUser.id,
-      actorId: request?.user?.sub,
+      id,
+      actorId: request.user.sub,
     });
     return new ResponseUserDto(updatedUser);
   }
@@ -73,20 +88,22 @@ export class UserService {
   async delete(id: string, request: AuthRequest): Promise<void> {
     const user: User = await this.findOne(id);
     user.deleted_at = new Date();
-    await this.save(user);
+    await this.userRepository.save(user);
     this.logger.log('USER_DELETED_SUCCESS', {
-      id: user.id,
-      actorId: request?.user?.sub,
+      id,
+      actorId: request.user.sub,
     });
   }
 
   async findOneBy(
     where: FindOptionsWhere<User> | FindOptionsWhere<User>[],
+    options?: Omit<FindOneOptions<User>, 'where'>,
   ): Promise<User | null> {
-    return await this.userRepository.findOneBy(where);
+    return await this.userRepository.findOne({ where, ...options });
   }
 
-  async save(user: User): Promise<User> {
-    return this.userRepository.save(user);
+  async updatePassword(user: User, password: string): Promise<void> {
+    user.password = await this.hashService.hash(password);
+    await this.userRepository.save(user);
   }
 }

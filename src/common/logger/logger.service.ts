@@ -1,8 +1,8 @@
-import { ConsoleLogger, Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable, Scope } from '@nestjs/common';
 
 type LogMeta = Record<string, unknown> | string | number | boolean | Error;
 
-@Injectable()
+@Injectable({ scope: Scope.TRANSIENT })
 export class LoggerService extends ConsoleLogger {
   log(message: unknown, ...optionalParams: unknown[]): void {
     const formatted = this.format(message, optionalParams as LogMeta[]);

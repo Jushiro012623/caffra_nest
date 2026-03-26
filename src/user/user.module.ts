@@ -6,12 +6,14 @@ import { CryptoModule } from '@app/crypto/crypto.module';
 import { UserController } from './user.controller';
 import { LoggerModule } from '@app/common/logger/logger.module';
 import { JwtModule } from '@app/auth/jwt/jwt.module';
+import { RoleModule } from '@app/role/role.module';
 
 @Module({
   imports: [
     CryptoModule,
     TypeOrmModule.forFeature([User]),
     LoggerModule,
+    RoleModule,
     JwtModule,
   ],
   providers: [UserService],

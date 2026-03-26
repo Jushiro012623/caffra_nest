@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { DataSourceOptions } from 'typeorm';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { User } from '@app/user/entities/user.entity';
+import { Role } from '@app/role/entities/role.entity';
 
 const env: Record<string, string | undefined> = process.env;
 
@@ -18,7 +19,7 @@ export const databaseSource = (): DataSourceOptions => {
     database: env.DB_NAME || 'nestjs',
     synchronize: false,
     migrationsRun: false,
-    entities: [User],
+    entities: [User, Role],
     migrations: ['dist/database/migration/*.js'],
     // logging: ['query', 'error', 'warn'],
     // maxQueryExecutionTime: 1,
